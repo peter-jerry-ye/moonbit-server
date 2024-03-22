@@ -1,0 +1,7 @@
+{
+  "is_main": true,
+  "import": [
+    "username/hello/lib",
+    "peter-jerry-ye/wasi"
+  ]
+}
