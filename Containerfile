@@ -1,18 +1,15 @@
 # Build stage
-FROM --platform=$BUILDPLATFORM scratch AS moon-setup
-ADD https://cli.moonbitlang.com/ubuntu_x86_64_moon_setup.sh /app/moon_setup.sh
-
-FROM --platform=$BUILDPLATFORM alpine AS wasm-tools
+FROM --platform=linux/amd64 alpine AS wasm-tools
 ADD https://github.com/bytecodealliance/wasm-tools/releases/download/v1.201.0/wasm-tools-1.201.0-x86_64-linux.tar.gz /app/wasm-tools.tar.gz
 RUN tar -xzf /app/wasm-tools.tar.gz -C /app --strip-components 1 && rm /app/wasm-tools.tar.gz
 
-FROM --platform=$BUILDPLATFORM alpine AS wasmedge
-ADD https://github.com/WasmEdge/WasmEdge/releases/download/0.14.0-rc.2/WasmEdge-0.14.0-rc.2-manylinux2014_aarch64.tar.gz /app/wasmedge.tar.gz
+FROM --platform=linux/amd64 alpine AS wasmedge
+ADD https://github.com/WasmEdge/WasmEdge/releases/download/0.14.0-rc.4/WasmEdge-0.14.0-rc.4-manylinux2014_x86_64.tar.gz /app/wasmedge.tar.gz
 RUN tar -xzf /app/wasmedge.tar.gz -C /app --strip-components 1 && rm /app/wasmedge.tar.gz
 
-FROM --platform=$BUILDPLATFORM alpine AS moon
+FROM --platform=linux/amd64 alpine AS moon
 
-COPY --from=moon-setup --chmod=755 /app/moon_setup.sh /app/moon_setup.sh
+ADD --chmod=755 https://cli.moonbitlang.com/ubuntu_x86_64_moon_setup.sh /app/moon_setup.sh
 RUN apk add --no-cache bash curl
 RUN /app/moon_setup.sh
 
@@ -36,7 +33,7 @@ RUN sed -i -E 's/\(import "spectest" "print_char"\)//' /root/main.wat \
 RUN /app/wasm-tools/wasm-tools parse /root/main.wat -o /root/main.wasm
 RUN /app/wasm-tools/wasm-tools strip /root/main.wasm -a -o /root/main.wasm
 
-FROM --platform=$BUILDPLATFORM httpd:2.4.58-bookworm
+FROM --platform=linux/amd64 httpd:2.4.58-bookworm
 
 COPY --chmod=755 main.sh /usr/local/apache2/cgi-bin/main
 COPY --from=build-wasm /root/main.wasm /app/main.wasm
