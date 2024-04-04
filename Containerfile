@@ -34,7 +34,7 @@ COPY --from=wasm-tools /app /app/wasm-tools
 RUN sed -i -E 's/\(import "spectest" "print_char"\)//' /root/main.wat \
     && sed -i 's/moonbit\.memory/memory/g' /root/main.wat
 RUN /app/wasm-tools/wasm-tools parse /root/main.wat -o /root/main.wasm
-RUN /app/wasm-tools/wasm-tools strip /root/main.wasm -o /root/main.wasm
+RUN /app/wasm-tools/wasm-tools strip /root/main.wasm -a -o /root/main.wasm
 
 FROM --platform=$BUILDPLATFORM httpd:2.4.58-bookworm
 
